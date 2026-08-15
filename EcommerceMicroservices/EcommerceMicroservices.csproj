@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Deploy\Docker\" />
+    <Folder Include="Deploy\Kubernetes\" />
+    <Folder Include="Docs\Events\" />
+    <Folder Include="Docs\Diagrams\" />
+    <Folder Include="src\Gateway\" />
+    <Folder Include="src\BFF\" />
+    <Folder Include="src\BuildingBlocks\" />
+    <Folder Include="src\Services\Catalog\" />
+    <Folder Include="src\Services\Identity\" />
+    <Folder Include="src\Services\Notification\" />
+    <Folder Include="src\Services\Ordering\" />
+    <Folder Include="tests\" />
+  </ItemGroup>
+
+</Project>
