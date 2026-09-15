@@ -1,3 +1,41 @@
 <Solution>
-  <Project Path="EcommerceMicroservices/EcommerceMicroservices.csproj" />
+
+  <!-- Source code -->
+  <Folder Name="/src/" />
+
+  <Folder Name="/src/Services/" />
+
+  <Folder Name="/src/Services/Catalog/">
+    <Project Path="src/Services/Catalog/Ecommerce.Catalog.Api/Ecommerce.Catalog.Api.csproj" />
+    <Project Path="src/Services/Catalog/Ecommerce.Catalog.Application/Ecommerce.Catalog.Application.csproj" />
+    <Project Path="src/Services/Catalog/Ecommerce.Catalog.Domain/Ecommerce.Catalog.Domain.csproj" />
+    <Project Path="src/Services/Catalog/Ecommerce.Catalog.Infrastructure/Ecommerce.Catalog.Infrastructure.csproj" />
+  </Folder>
+
+  <!-- Future microservices -->
+  <Folder Name="/src/Services/Ordering/" />
+  <Folder Name="/src/Services/Identity/" />
+  <Folder Name="/src/Services/Notification/" />
+
+  <!-- Edge services -->
+  <Folder Name="/src/Gateway/" />
+  <Folder Name="/src/Bff/" />
+
+  <!-- Shared technical contracts -->
+  <Folder Name="/src/BuildingBlocks/" />
+
+  <!-- Tests -->
+  <Folder Name="/tests/" />
+
+  <!-- Deployment -->
+  <Folder Name="/deploy/" />
+  <Folder Name="/deploy/docker/" />
+  <Folder Name="/deploy/kubernetes/" />
+
+  <!-- Documentation -->
+  <Folder Name="/docs/" />
+  <Folder Name="/docs/architecture/" />
+  <Folder Name="/docs/events/" />
+  <Folder Name="/docs/diagrams/" />
+
 </Solution>
