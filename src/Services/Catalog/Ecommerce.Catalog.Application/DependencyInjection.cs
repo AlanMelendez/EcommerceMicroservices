@@ -1,15 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ecommerce.Catalog.Application
 {
     static class DependencyInjection 
     {
-        static void AddApplication(this IServiceCollection services)
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            // Register application services, handlers, validators, etc.
+            services.AddMediatR(
+                configuration =>
+                    configuration.RegisterServicesFromAssemblies(typeof(DependencyInjection).Assembly)
+            );
+
+            services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+            return services;
         }
     }
 }
