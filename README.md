@@ -1,2135 +1,1178 @@
-# EcommerceMicroservices
-A practical enterprise backend training project built with **.NET 10**, **ASP.NET Core**, **Clean Architecture**, **CQRS**, **Kafka**, **Docker**, **Redis**, **SQL Server**, **Event-Driven Architecture**, **Event Sourcing**, and **Kubernetes**.
+# EcommerceMicroservices — Azure Scope
 
-The main goal of this repository is not only to build an e-commerce system.
+A practical enterprise backend training project built with **.NET 10** and focused on modern .NET backend development on **Microsoft Azure**.
 
-The goal is to understand how professional backend systems are designed when they need to be:
+> This branch is intentionally different from the `main` learning track.
+>
+> - **`main`** keeps the broader distributed-systems path, including Kafka, Saga, Event Sourcing, and other advanced patterns.
+> - **`azure-scope`** focuses on Azure technologies and the target .NET/Azure backend role.
 
-* Maintainable
-* Scalable
-* Secure
-* Observable
-* Testable
-* Resilient
-* Distributed
-* Production-ready
-
-This project follows a **rapid training approach**.
-
-Instead of implementing every pattern in every service, each important concept is implemented first in **one representative service, endpoint, or business flow**.
-
-For example:
-
-* CQRS → one command and one query
-* Redis → one product query
-* Rate Limiting → one authentication endpoint
-* Kafka → one `OrderCreated` event
-* Outbox Pattern → one order flow
-* Idempotency → one Kafka consumer
-* Event Sourcing → one representative aggregate
-* Separate CQRS databases → one representative read/write flow
-* Kubernetes → deploy the main services and infrastructure
-
-This keeps the project realistic without creating unnecessary repetition.
+Both branches share the same initial .NET and Clean Architecture foundation, but they can evolve independently.
 
 ---
 
-# Architecture Goals
+## Learning Goal
 
-The project will practice the following architectural styles and enterprise concepts:
+The objective is not only to make the application work.
 
-* Microservices Architecture
-* Clean Architecture
-* Event-Driven Architecture
-* Backend for Frontend — BFF
-* API Gateway
-* CQRS
-* CQRS with separate physical read/write databases
-* Event Sourcing
-* Domain-Driven Design concepts
-* Repository Pattern
-* Unit of Work Pattern
-* Mediator Pattern
-* Result Pattern
-* Outbox Pattern
-* Idempotent Consumers
-* Retry Strategies
-* Eventual Consistency
-* Distributed Caching
-* Resilience Patterns
-* Structured Logging
-* Distributed Tracing
-* Containerization
-* Kubernetes orchestration
+For every important topic, the training should explain:
+
+1. What is it?
+2. What problem does it solve?
+3. Why are we using it here?
+4. Where does it belong in the architecture?
+5. How do we implement it?
+6. How do we test it?
+7. What can go wrong?
+8. How would we use it in production?
+
+The project follows a **rapid training approach**: implement each important concept in one representative flow instead of repeating the same pattern across every service.
 
 ---
 
-# Technology Stack
+# Target Skills
 
-## Backend
-
-* .NET 10
-* C#
-* ASP.NET Core Web API
-* ASP.NET Core Worker Services
-* Entity Framework Core
-* MediatR
-* FluentValidation
-* AutoMapper where useful
-
-## Databases
-
-* SQL Server
-* Separate database per microservice
-* Separate physical read/write databases for one CQRS implementation
-
-## Messaging
-
-* Apache Kafka
-* Kafka Topics
-* Producers
-* Consumers
-* Consumer Groups
-* Integration Events
-* Dead Letter Topics
-* Retry Strategies
-
-## Cache
-
-* Redis
-
-## Security
-
-* JWT Authentication
-* Refresh Tokens
-* Roles
-* Policy-Based Authorization
-* Rate Limiting
-* Secure configuration
-* Environment Variables
-* User Secrets
-
-## Observability
-
-* Serilog
-* Structured Logging
-* Correlation IDs
-* OpenTelemetry
-* Distributed Tracing
-* Health Checks
-
-## Infrastructure
-
-* Docker
-* Docker Compose
-* Kubernetes
-* API Gateway
-* BFF
-
-## Testing
-
-* xUnit
-* Moq or NSubstitute
-* ASP.NET Core Integration Testing
-* TestContainers where useful
-* Kafka integration testing where useful
+- .NET 10
+- ASP.NET Core REST APIs
+- Clean Architecture
+- Microservices
+- Domain-Driven Design (DDD)
+- CQRS
+- CQRS with separate physical read/write databases
+- Entity Framework Core
+- SQL Server
+- Redis distributed caching
+- Event-Driven Architecture (EDA)
+- Azure Service Bus
+- Outbox Pattern
+- Eventual Consistency
+- Azure Functions
+- JWT
+- OAuth 2.0
+- Microsoft Entra ID
+- Role, scope, and policy-based authorization
+- Azure Key Vault
+- Managed Identity
+- Application Insights
+- OpenTelemetry
+- Azure App Service
+- Docker
+- Azure Container Registry (ACR)
+- Azure Kubernetes Service (AKS)
+- xUnit
+- Integration testing
+- Performance and security practices
+- Git
+- Azure DevOps CI/CD
 
 ---
 
-# Microservices
+# Branch Strategy
 
-The system contains the following main services.
+## `main` — Distributed Systems / Pattern Track
 
-## 1. Catalog Service
+The `main` branch continues the broader distributed-systems and architecture path.
 
-Responsible for:
+Representative topics include:
 
-* Products
-* Categories
-* Product queries
-* Product management
+- Apache Kafka
+- Producers and consumers
+- Consumer groups
+- Retry and dead-letter strategies
+- Outbox Pattern
+- Idempotent consumers
+- Saga
+- Compensating transactions
+- Event Sourcing
+- API Gateway / BFF where useful
+- Advanced distributed-system patterns
 
-Main technologies and patterns:
+This track exists to explore patterns and technologies that are valuable but are not required to block the Azure-focused training.
 
-* Clean Architecture
-* Entity Framework Core
-* SQL Server
-* CQRS
-* MediatR
-* Redis
-* FluentValidation
-* Result Pattern
+## `azure-scope` — Azure / Job-Focused Track
 
-Example endpoints:
+This branch focuses on:
 
-```http
-GET /api/products
-GET /api/products/{id}
-POST /api/products
-PUT /api/products/{id}
-DELETE /api/products/{id}
-```
+- Azure Service Bus as the primary message broker
+- Azure Functions for asynchronous event processing
+- Microsoft Entra ID as the primary Identity Provider
+- Azure Key Vault
+- Managed Identity
+- Application Insights
+- OpenTelemetry
+- Azure App Service
+- Azure Container Registry
+- AKS
+- Azure DevOps CI/CD
 
-Redis will initially be applied only to:
-
-```http
-GET /api/products/{id}
-```
-
----
-
-## 2. Ordering Service
-
-Responsible for:
-
-* Orders
-* Order Items
-* Order Status
-* Order business rules
-* Outbox Messages
-
-This will be one of the most important services in the project.
-
-Main patterns:
-
-* Clean Architecture
-* CQRS
-* MediatR
-* Repository Pattern
-* Unit of Work
-* Domain Events
-* Integration Events
-* Outbox Pattern
-* Event-Driven Architecture
-* Event Sourcing
-* Eventual Consistency
-
-Main representative endpoint:
-
-```http
-POST /api/orders
-```
-
-The main flow will become:
-
-```text
-Client
-  │
-  ▼
-Ordering API
-  │
-  ▼
-CreateOrderCommand
-  │
-  ▼
-CreateOrderHandler
-  │
-  ▼
-Order Aggregate
-  │
-  ├── Save Order
-  └── Save Outbox Message
-        │
-        ▼
-     SQL Server
-        │
-        ▼
-Outbox Background Worker
-        │
-        ▼
-      Kafka
-        │
-        ▼
-Notification Service
-```
+Kafka, Saga, and Event Sourcing are **not required to finish this branch**.
 
 ---
 
-## 3. Identity Service
+# Architecture Principles
 
-Responsible for:
+## Clean Architecture
 
-* Users
-* Password hashing
-* Authentication
-* JWT Access Tokens
-* Refresh Tokens
-* Roles
-* Policies
-
-Representative endpoints:
-
-```http
-POST /api/auth/login
-POST /api/auth/refresh
-```
-
-Security concepts:
-
-* JWT
-* Refresh Tokens
-* Password Hashing
-* Role-Based Authorization
-* Policy-Based Authorization
-* Rate Limiting
-
-Rate limiting will first be applied only to:
-
-```http
-POST /api/auth/login
-```
-
----
-
-## 4. Notification Service
-
-Responsible for consuming integration events.
-
-Initial event:
-
-```text
-OrderCreated
-```
-
-Flow:
-
-```text
-Kafka
-  │
-  ▼
-Notification Consumer
-  │
-  ├── Validate Event
-  ├── Check Idempotency
-  ├── Execute Retry Strategy
-  └── Simulate Notification
-```
-
-The service will initially simulate:
-
-* Email notifications
-* Push notifications
-
-It will also demonstrate:
-
-* Kafka Consumers
-* Retry
-* Dead Letter Topics
-* Idempotency
-* Consumer Error Handling
-
----
-
-## 5. API Gateway
-
-The API Gateway will act as a central entry point.
-
-Possible responsibilities:
-
-* Routing
-* Authentication forwarding
-* Headers
-* Rate limiting
-* Request forwarding
-
-Architecture:
-
-```text
-Client
-  │
-  ▼
-API Gateway
-  │
-  ├── Catalog Service
-  ├── Ordering Service
-  └── Identity Service
-```
-
-YARP can be used as the reverse proxy implementation.
-
----
-
-## 6. BFF — Backend for Frontend
-
-The BFF provides APIs designed specifically for frontend needs.
-
-It is different from the API Gateway.
-
-The Gateway mainly routes requests.
-
-The BFF can combine information from multiple services.
-
-Example:
-
-```http
-GET /api/home
-```
-
-The BFF could internally call:
-
-```text
-Catalog Service
-+
-Ordering Service
-```
-
-and return:
-
-```json
-{
-  "featuredProducts": [],
-  "recentOrders": []
-}
-```
-
-This teaches:
-
-* API Composition
-* HttpClient
-* Service-to-service communication
-* Resilience
-* Frontend-specific DTOs
-
----
-
-# High-Level Architecture
-
-```mermaid
-flowchart TD
-
-    Client[Frontend Client]
-
-    BFF[BFF Service]
-    Gateway[API Gateway]
-
-    Catalog[Catalog Service]
-    Ordering[Ordering Service]
-    Identity[Identity Service]
-    Notification[Notification Service]
-
-    CatalogDb[(Catalog DB)]
-    OrderingDb[(Ordering DB)]
-    IdentityDb[(Identity DB)]
-
-    Redis[(Redis)]
-    Kafka[(Kafka)]
-
-    Client --> BFF
-    BFF --> Gateway
-
-    Gateway --> Catalog
-    Gateway --> Ordering
-    Gateway --> Identity
-
-    Catalog --> CatalogDb
-    Catalog --> Redis
-
-    Ordering --> OrderingDb
-
-    Identity --> IdentityDb
-
-    Ordering --> Kafka
-    Kafka --> Notification
-```
-
----
-
-# Database-per-Service
-
-Each microservice owns its own database.
-
-```text
-Catalog Service
-      │
-      ▼
-CatalogDb
-
-
-Ordering Service
-      │
-      ▼
-OrderingDb
-
-
-Identity Service
-      │
-      ▼
-IdentityDb
-```
-
-A service must not directly query another service's database.
-
-For example, Ordering should not execute:
-
-```sql
-SELECT *
-FROM IdentityDb.Users
-```
-
-Instead, services communicate through:
-
-* HTTP
-* Kafka Events
-* Local replicated data when appropriate
-
-This creates clear service boundaries.
-
----
-
-# CQRS
-
-CQRS means:
-
-> Command Query Responsibility Segregation.
-
-It separates operations that change data from operations that read data.
-
-```text
-Command
-   │
-   ▼
-Change System State
-
-
-Query
-   │
-   ▼
-Read Information
-```
-
-Representative implementations:
-
-```text
-CreateOrderCommand
-CreateOrderCommandHandler
-```
-
-and:
-
-```text
-GetProductByIdQuery
-GetProductByIdQueryHandler
-```
-
-MediatR will be used to dispatch commands and queries.
-
----
-
-# CQRS with Separate Physical Read/Write Databases
-
-Later in the project, CQRS will be taken one step further.
-
-Instead of commands and queries using the same database:
-
-```text
-Commands ─┐
-          ├── Database
-Queries ──┘
-```
-
-we will practice:
-
-```text
-Commands
-   │
-   ▼
-Write Database
-   │
-   ▼
-Events
-   │
-   ▼
-Read Projection
-   │
-   ▼
-Read Database
-   ▲
-   │
-Queries
-```
-
-Architecture:
-
-```text
-POST /orders
-     │
-     ▼
-Command Handler
-     │
-     ▼
-OrderingWriteDb
-     │
-     ▼
-Domain / Integration Event
-     │
-     ▼
-Projection Handler
-     │
-     ▼
-OrderingReadDb
-```
-
-Then queries use:
-
-```text
-GET /orders
-     │
-     ▼
-OrderingReadDb
-```
-
-This concept will be implemented only for one representative flow.
-
-The purpose is to understand why large distributed systems may optimize writes and reads independently.
-
----
-
-# Event-Driven Architecture
-
-The system uses Kafka for asynchronous communication.
-
-Example:
-
-```text
-Ordering Service
-       │
-       │ OrderCreated
-       ▼
-     Kafka
-       │
-       ▼
-Notification Service
-```
-
-The producer does not need to wait for the Notification Service.
-
-This reduces direct coupling between services.
-
----
-
-# Integration Events
-
-Our first integration event will be:
-
-```text
-OrderCreated
-```
-
-Conceptual contract:
-
-```text
-EventId
-OrderId
-UserId
-Total
-CreatedAt
-CorrelationId
-```
-
-Integration events should contain only the information required by other services.
-
-Database entities should not be sent directly through Kafka.
-
----
-
-# Domain Events vs Integration Events
-
-A Domain Event describes something important that happened inside one business domain.
-
-Example:
-
-```text
-OrderCreatedDomainEvent
-```
-
-An Integration Event communicates something to another microservice.
-
-Example:
-
-```text
-OrderCreatedIntegrationEvent
-```
-
-Possible flow:
-
-```text
-Order Aggregate
-      │
-      ▼
-Domain Event
-      │
-      ▼
-Application Layer
-      │
-      ▼
-Outbox Message
-      │
-      ▼
-Integration Event
-      │
-      ▼
-Kafka
-```
-
----
-
-# Outbox Pattern
-
-Publishing directly to Kafka after saving an order can create consistency problems.
-
-Problem:
-
-```text
-Save Order
-    │
-    ▼
-Database Success
-    │
-    ▼
-Publish Kafka Event
-    │
-    X
-Kafka Failure
-```
-
-The order exists, but the event was lost.
-
-The Outbox Pattern solves this by saving both pieces of information in one transaction.
-
-```text
-Database Transaction
-      │
-      ├── Save Order
-      └── Save OutboxMessage
-      │
-      ▼
-Commit
-```
-
-A background worker later publishes the pending events:
-
-```text
-Outbox
-   │
-   ▼
-Background Worker
-   │
-   ▼
-Kafka
-```
-
----
-
-# Background Workers
-
-The Ordering Service will include an Outbox Publisher.
-
-It will:
-
-```text
-Read Pending Messages
-        │
-        ▼
-Publish To Kafka
-        │
-        ▼
-Mark Message As Processed
-```
-
-This introduces the .NET:
-
-```csharp
-BackgroundService
-```
-
-concept.
-
----
-
-# Idempotency
-
-Kafka can deliver the same message more than once.
-
-Example:
-
-```text
-OrderCreated #100
-OrderCreated #100
-```
-
-The Notification Service should not send the same notification twice.
-
-We will use a processed message mechanism:
-
-```text
-Message Received
-      │
-      ▼
-EventId Already Processed?
-      │
-  ┌───┴───┐
- Yes      No
-  │        │
-Ignore   Process
-```
-
----
-
-# Retry Strategy
-
-Temporary errors can happen.
-
-Example:
-
-```text
-Kafka Event
-    │
-    ▼
-Notification Service
-    │
-    X
-Temporary Failure
-```
-
-We can retry:
-
-```text
-Attempt 1
-Attempt 2
-Attempt 3
-```
-
-If all attempts fail, the message can move to a Dead Letter Topic.
-
----
-
-# Dead Letter Topic
-
-Example:
-
-```text
-orders.created
-      │
-      ▼
-Consumer
-      │
-      X
-Retries Exhausted
-      │
-      ▼
-orders.created.dlq
-```
-
-This allows failed messages to be inspected and processed later.
-
----
-
-# Event Sourcing
-
-Event Sourcing stores changes as a sequence of events instead of only storing the latest state.
-
-Traditional model:
-
-```text
-Order
-Status = Shipped
-```
-
-With Event Sourcing:
-
-```text
-OrderCreated
-     │
-     ▼
-OrderConfirmed
-     │
-     ▼
-OrderPaid
-     │
-     ▼
-OrderShipped
-```
-
-The current state can be rebuilt by replaying those events.
-
-Example:
-
-```text
-OrderCreated
-+
-OrderPaid
-+
-OrderShipped
-=
-Current Order State
-```
-
-For training, Event Sourcing will be applied to only **one representative Order aggregate**.
-
-We will learn:
-
-* Event Store
-* Aggregate reconstruction
-* Event stream
-* Event version
-* Append-only events
-* Event replay
-* Projections
-* Event Sourcing vs normal CRUD
-* Event Sourcing vs Integration Events
-
-We will not convert the complete application to Event Sourcing.
-
----
-
-# Eventual Consistency
-
-In distributed systems, every service does not always update at exactly the same time.
-
-Example:
-
-```text
-Ordering Service:
-Order Created
-```
-
-but:
-
-```text
-Notification Service:
-Event not processed yet
-```
-
-A short time later:
-
-```text
-Notification Service:
-Notification Sent
-```
-
-The system eventually reaches a consistent state.
-
-This is called:
-
-> Eventual Consistency.
-
-Kafka, Event Sourcing, Outbox, and physical CQRS databases make this concept easier to understand.
-
----
-
-# Redis
-
-Redis will be used as a distributed cache.
-
-Representative endpoint:
-
-```http
-GET /api/products/{id}
-```
-
-Flow:
-
-```text
-Request
-   │
-   ▼
-Redis
-   │
-   ├── Cache Hit
-   │      │
-   │      ▼
-   │    Return
-   │
-   └── Cache Miss
-          │
-          ▼
-      SQL Server
-          │
-          ▼
-      Store Redis
-          │
-          ▼
-        Return
-```
-
-We will also study cache invalidation.
-
----
-
-# BFF Resilience
-
-The BFF depends on other services.
-
-Example:
-
-```text
-BFF
- │
- ▼
-Catalog Service
-```
-
-Distributed systems can fail temporarily.
-
-We will apply resilience to one HttpClient.
-
-Concepts:
-
-* Timeout
-* Retry
-* Circuit Breaker
-
-Example:
-
-```text
-BFF
- │
- ▼
-Catalog failing repeatedly
- │
- ▼
-Circuit Breaker Opens
- │
- ▼
-Stop requests temporarily
-```
-
----
-
-# Correlation IDs
-
-A Correlation ID allows us to follow one request across multiple services.
-
-Example:
-
-```text
-CorrelationId = 83c1741...
-```
-
-The same identifier can travel through:
-
-```text
-Gateway
-   │
-   ▼
-BFF
-   │
-   ▼
-Ordering
-   │
-   ▼
-Kafka
-   │
-   ▼
-Notification
-```
-
-Logs can then be searched using the same Correlation ID.
-
----
-
-# Structured Logging
-
-Instead of only logging text:
-
-```text
-Order created
-```
-
-logs should contain structured information.
-
-Example:
-
-```text
-Event = OrderCreated
-OrderId = 100
-UserId = 20
-CorrelationId = abc123
-```
-
-Sensitive information must never be logged.
-
-Do not log:
-
-* Passwords
-* JWT Access Tokens
-* Refresh Tokens
-* Database passwords
-* Secret keys
-
----
-
-# Distributed Tracing
-
-OpenTelemetry will be introduced to understand request traces.
-
-Conceptual trace:
-
-```text
-Create Order Trace
-│
-├── API Gateway
-├── Ordering API
-├── Command Handler
-├── SQL Server
-├── Kafka Producer
-└── Notification Consumer
-```
-
-This helps identify:
-
-* Slow requests
-* Failing dependencies
-* Service relationships
-* Distributed errors
-
----
-
-# Authentication
-
-The Identity Service will generate:
-
-```text
-Access Token
-+
-Refresh Token
-```
-
-Flow:
-
-```text
-User
-  │
-  ▼
-POST /auth/login
-  │
-  ▼
-Identity Service
-  │
-  ├── Validate Credentials
-  ├── Generate JWT
-  └── Generate Refresh Token
-```
-
----
-
-# Authorization
-
-We will practice both roles and policies.
-
-Example role:
-
-```text
-Admin
-```
-
-Representative protected endpoint:
-
-```http
-POST /api/products
-```
-
-Policy example:
-
-```text
-CanManageCatalog
-```
-
----
-
-# Rate Limiting
-
-Rate limiting will first be applied only to:
-
-```http
-POST /api/auth/login
-```
-
-This helps reduce:
-
-* Brute-force attacks
-* API abuse
-* Excessive traffic
-
----
-
-# Health Checks
-
-Services will expose health endpoints.
-
-Example:
-
-```http
-/health
-```
-
-Later we can separate:
-
-```http
-/health/live
-/health/ready
-```
-
-Liveness answers:
-
-> Is the application running?
-
-Readiness answers:
-
-> Is the application ready to process requests?
-
----
-
-# Docker
-
-Docker will be used to create reproducible environments.
-
-Local infrastructure will include:
-
-```text
-Docker Compose
-│
-├── SQL Server
-├── Kafka
-├── Kafka UI
-├── Redis
-└── Services
-```
-
-During early development, infrastructure can run in Docker while APIs run directly from the IDE or .NET CLI.
-
-Later the complete system can run using containers.
-
----
-
-# Docker Networking
-
-Containers communicate using service names.
-
-Instead of:
-
-```text
-localhost:9092
-```
-
-a service inside Docker may use:
-
-```text
-kafka:9092
-```
-
-Example:
-
-```text
-catalog-api
-ordering-api
-identity-api
-notification-service
-redis
-kafka
-sqlserver
-```
-
-Docker provides DNS resolution between services inside the same network.
-
----
-
-# Kubernetes
-
-After the Docker version is stable, we will deploy a small representative version using Kubernetes.
-
-The goal is not to create a complex Kubernetes platform.
-
-We will learn the important building blocks.
-
-Topics:
-
-* Pods
-* Deployments
-* Services
-* ConfigMaps
-* Secrets
-* Environment Variables
-* Health Probes
-* Replica Scaling
-* Rolling Updates
-* Resource Requests
-* Resource Limits
-
-Example:
-
-```text
-Kubernetes Cluster
-│
-├── Catalog Deployment
-│     └── Catalog Pods
-│
-├── Ordering Deployment
-│     └── Ordering Pods
-│
-├── Notification Deployment
-│
-├── Gateway Deployment
-│
-└── Services
-```
-
-Representative configuration:
-
-```text
-Deployment
-   │
-   ▼
-2 Catalog Pods
-   │
-   ▼
-Kubernetes Service
-   │
-   ▼
-Traffic Distribution
-```
-
-We will deploy only the required services to understand Kubernetes instead of creating a large production cluster.
-
----
-
-# Configuration
-
-Different environments will use different configurations.
-
-Examples:
-
-```text
-Development
-Testing
-Production
-```
-
-Configuration sources:
-
-* appsettings.json
-* appsettings.Development.json
-* Environment Variables
-* User Secrets
-* Docker Compose variables
-* Kubernetes ConfigMaps
-* Kubernetes Secrets
-
-Secrets must not be committed to Git.
-
----
-
-# Clean Architecture
-
-Where appropriate, a service will contain:
+Representative services use:
 
 ```text
 Service
-│
 ├── Domain
 ├── Application
 ├── Infrastructure
 └── API
 ```
 
-Example:
+### Domain
+
+Contains:
+
+- Entities
+- Value Objects
+- Domain Events
+- Business rules
+- Business invariants
+
+The Domain must not depend on infrastructure.
+
+### Application
+
+Contains:
+
+- Commands
+- Queries
+- Handlers
+- DTOs
+- Validators
+- Interfaces
+- Application use cases
+
+### Infrastructure
+
+Contains:
+
+- Entity Framework Core
+- SQL Server access
+- Repository implementations
+- Redis
+- Azure Service Bus integration
+- External infrastructure integrations
+
+### API
+
+Contains:
+
+- Controllers/endpoints
+- HTTP contracts
+- Middleware
+- Authentication and authorization configuration
+- Dependency Injection composition
+- OpenAPI
+
+The dependency direction should remain:
 
 ```text
-Catalog
-│
-├── Ecommerce.Catalog.Domain
-├── Ecommerce.Catalog.Application
-├── Ecommerce.Catalog.Infrastructure
-└── Ecommerce.Catalog.Api
+API
+├── Application
+└── Infrastructure
+
+Infrastructure
+├── Application
+└── Domain
+
+Application
+└── Domain
+
+Domain
+└── No dependencies
 ```
+
+---
+
+# Current Repository Structure
+
+The currently implemented service is Catalog:
+
+```text
+src/
+└── Services/
+    └── Catalog/
+        ├── Ecommerce.Catalog.Api/
+        ├── Ecommerce.Catalog.Application/
+        ├── Ecommerce.Catalog.Domain/
+        └── Ecommerce.Catalog.Infrastructure/
+```
+
+The repository grows only when the current learning step requires a new project or service.
+
+---
+
+# Catalog Service
+
+Catalog is the first representative microservice.
 
 Responsibilities:
 
-## Domain
+- Products
+- Categories
+- Product queries
+- Product management
 
-Contains:
+Concepts practiced here:
 
-* Entities
-* Value Objects
-* Domain Events
-* Business Rules
+- Clean Architecture
+- EF Core
+- SQL Server
+- Repository abstraction
+- Repository implementation
+- CQRS fundamentals
+- MediatR
+- FluentValidation
+- Result Pattern
+- DTOs
+- Dependency Injection
+- Redis later
 
-It should not depend on infrastructure.
-
-## Application
-
-Contains:
-
-* Commands
-* Queries
-* Handlers
-* DTOs
-* Validators
-* Interfaces
-* Application business flows
-
-## Infrastructure
-
-Contains:
-
-* Entity Framework Core
-* Repositories
-* Database configuration
-* Kafka Producers
-* Redis
-* External services
-
-## API
-
-Contains:
-
-* Controllers or endpoints
-* Middleware
-* Authentication configuration
-* Dependency Injection configuration
-* Swagger
-* HTTP concerns
-
----
-
-# Proposed Repository Structure
-
-```text
-EcommerceMicroservices/
-│
-├── src/
-│   │
-│   ├── Services/
-│   │   │
-│   │   ├── Catalog/
-│   │   │   ├── Ecommerce.Catalog.Api/
-│   │   │   ├── Ecommerce.Catalog.Application/
-│   │   │   ├── Ecommerce.Catalog.Domain/
-│   │   │   └── Ecommerce.Catalog.Infrastructure/
-│   │   │
-│   │   ├── Ordering/
-│   │   │   ├── Ecommerce.Ordering.Api/
-│   │   │   ├── Ecommerce.Ordering.Application/
-│   │   │   ├── Ecommerce.Ordering.Domain/
-│   │   │   └── Ecommerce.Ordering.Infrastructure/
-│   │   │
-│   │   ├── Identity/
-│   │   │   ├── Ecommerce.Identity.Api/
-│   │   │   ├── Ecommerce.Identity.Application/
-│   │   │   ├── Ecommerce.Identity.Domain/
-│   │   │   └── Ecommerce.Identity.Infrastructure/
-│   │   │
-│   │   └── Notification/
-│   │       ├── Ecommerce.Notification.Worker/
-│   │       ├── Ecommerce.Notification.Application/
-│   │       └── Ecommerce.Notification.Infrastructure/
-│   │
-│   ├── Gateway/
-│   │   └── Ecommerce.Gateway/
-│   │
-│   ├── Bff/
-│   │   └── Ecommerce.WebBff/
-│   │
-│   └── BuildingBlocks/
-│       └── Ecommerce.IntegrationEvents/
-│
-├── tests/
-│   │
-│   ├── Catalog/
-│   ├── Ordering/
-│   └── Integration/
-│
-├── deploy/
-│   │
-│   ├── docker/
-│   │   └── docker-compose.yml
-│   │
-│   └── kubernetes/
-│       ├── catalog/
-│       ├── ordering/
-│       ├── identity/
-│       ├── notification/
-│       └── gateway/
-│
-├── docs/
-│   ├── architecture/
-│   ├── events/
-│   └── diagrams/
-│
-├── AGENTS.md
-├── README.md
-└── EcommerceMicroservices.sln
-```
-
-The real structure may evolve during the training.
-
-We will create only the folders and projects required by the current step.
-
----
-
-# Shared Building Blocks
-
-Shared code must be used carefully in microservices.
-
-We do not want to create one large shared library containing business logic from all services.
-
-Initially, shared code will be limited to contracts such as:
-
-```text
-Ecommerce.IntegrationEvents
-```
-
-Example:
-
-```text
-OrderCreatedIntegrationEvent
-```
-
-Business domain models remain inside their own services.
-
----
-
-# Testing Strategy
-
-The project follows the same rapid training philosophy for tests.
-
-We will initially create:
-
-## Unit Test
-
-One handler:
-
-```text
-CreateOrderCommandHandler
-```
-
-## Integration Test
-
-One representative API endpoint.
-
-Example:
+Representative operations:
 
 ```http
-POST /api/orders
+POST /api/products
+GET /api/products/{id}
 ```
 
-## Kafka Integration Test
+We intentionally do not need complete CRUD to understand the architecture.
 
-Later, one event flow:
+Redis will later be applied to:
 
-```text
-OrderCreated
+```http
+GET /api/products/{id}
 ```
-
-## Event Sourcing Test
-
-One aggregate reconstruction test.
-
-Example:
-
-```text
-OrderCreated
-+
-OrderPaid
-+
-OrderShipped
-→
-Order State
-```
-
-We do not need hundreds of tests to learn the concepts.
 
 ---
 
-# Main End-to-End Flow
+# Ordering Service
 
-The most important business flow is:
+Ordering will be the main advanced business service.
+
+It will introduce **DDD** and later **physical CQRS**.
+
+Representative domain model:
 
 ```text
-Frontend
-   │
-   ▼
-BFF
-   │
-   ▼
-API Gateway
-   │
-   ▼
-Ordering Service
-   │
-   ▼
+Order                  ← Aggregate Root
+├── OrderItem          ← Entity
+├── Money              ← Value Object
+└── Domain Events
+```
+
+Representative command flow:
+
+```text
 CreateOrderCommand
-   │
-   ▼
+        ↓
+Command Handler
+        ↓
 Order Aggregate
-   │
-   ├── Order
-   └── Domain Event
-          │
-          ▼
-       Outbox
-          │
-          ▼
-     OrderingDb
-          │
-          ▼
-    Background Worker
-          │
-          ▼
-        Kafka
-          │
-          ▼
- Notification Service
-          │
-          ├── Idempotency Check
-          ├── Retry
-          └── Send Notification
+        ↓
+OrderingWriteDb
 ```
 
-Across the complete flow we will eventually use:
+DDD topics:
+
+- Bounded Context
+- Aggregate Root
+- Entity
+- Value Object
+- Business Invariant
+- Domain Event
+- Domain Event vs Integration Event
+- Ubiquitous Language
+
+---
+
+# CQRS
+
+CQRS means **Command Query Responsibility Segregation**.
+
+The main idea is to separate operations that **change state** from operations that **read state**.
+
+Commands change state:
 
 ```text
-JWT
-Correlation ID
-Structured Logging
-Distributed Tracing
-Health Checks
+CreateProductCommand
+CreateOrderCommand
 ```
 
----
+Queries read state:
 
-# Security Principles
+```text
+GetProductByIdQuery
+GetOrderByIdQuery
+```
 
-The project follows these security rules:
+Catalog first teaches CQRS using one database.
 
-* Never store plain-text passwords
-* Never log passwords
-* Never log JWT tokens
-* Never log refresh tokens
-* Validate all external input
-* Protect write endpoints
-* Use JWT expiration
-* Use refresh tokens carefully
-* Use authorization policies
-* Apply Rate Limiting where appropriate
-* Keep secrets outside source control
-* Use HTTPS in production
-* Configure CORS carefully
-* Avoid returning internal exception details
-* Follow OWASP API security principles
+Ordering then teaches the advanced form using separate physical databases.
 
 ---
 
-# Learning Roadmap
-
-## Phase 1 — Microservice Foundations
-
-### Step 0
-
-Define microservices domain and scope.
-
-### Step 1
-
-Create solution and folder structure.
-
-### Step 2
-
-Explain microservices architecture.
-
-### Step 3
-
-Create Catalog Service.
-
-### Step 4
-
-Add Clean Architecture to Catalog Service.
-
-### Step 5
-
-Create Catalog domain entities.
-
-### Step 6
-
-Configure Entity Framework Core for Catalog Service.
-
-### Step 7
-
-Implement basic Catalog CRUD.
-
----
-
-# Phase 2 — Ordering
-
-### Step 8
-
-Create Ordering Service.
-
-### Step 9
-
-Create Ordering domain entities.
-
-### Step 10
-
-Implement Create Order flow.
-
----
-
-# Phase 3 — Event-Driven Architecture
-
-### Step 11
-
-Explain Event-Driven Architecture.
-
-### Step 12
-
-Add Kafka using Docker Compose.
-
-### Step 13
-
-Create shared Integration Event contracts.
-
-### Step 14
-
-Publish `OrderCreated` directly to Kafka.
-
-### Step 15
-
-Create Notification Service.
-
-### Step 16
-
-Consume `OrderCreated`.
-
-### Step 17
-
-Add Retry Strategy.
-
-### Step 18
-
-Add Idempotency.
-
----
-
-# Phase 4 — Reliable Messaging
-
-### Step 19
-
-Explain Outbox Pattern.
-
-### Step 20
-
-Implement Outbox table.
-
-### Step 21
-
-Add Outbox Background Worker.
-
-### Step 22
-
-Replace direct Kafka publishing with Outbox Pattern.
-
----
-
-# Phase 5 — Observability
-
-### Step 23
-
-Add Correlation IDs.
-
-### Step 24
-
-Add Structured Logging.
-
-### Step 25
-
-Add Health Checks.
-
----
-
-# Phase 6 — Edge Services and Security
-
-### Step 26
-
-Add API Gateway.
-
-### Step 27
-
-Create Identity Service and JWT authentication.
-
-### Step 28
-
-Protect one representative endpoint.
-
-### Step 29
-
-Add Redis to one representative use case.
-
-### Step 30
-
-Add Rate Limiting to one representative endpoint.
-
----
-
-# Phase 7 — Testing and Refactoring
-
-### Step 31
-
-Add one Unit Test.
-
-### Step 32
-
-Add one Integration Test.
-
-### Step 33
-
-Review Clean Code and refactor.
-
----
-
-# Phase 8 — Advanced Enterprise Architecture
-
-### Step 34
-
-Add BFF with one API Composition endpoint.
-
-Topics:
-
-* BFF Pattern
-* HttpClient
-* API Composition
-* Resilience
-* Timeout
-* Retry
-* Circuit Breaker
-
-### Step 35
-
-Implement Event Sourcing for one representative Order aggregate.
-
-Topics:
-
-* Event Store
-* Event Streams
-* Aggregate Reconstruction
-* Event Replay
-* Projections
-* Event Versions
-
-### Step 36
-
-Implement CQRS with separate physical read/write databases.
-
-Representative scope:
+# Physical CQRS — Required
+
+Physical CQRS is a required learning objective for this branch.
+
+Ordering will use:
+
+```text
+                  Ordering
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+          ▼                     ▼
+      Write Side             Read Side
+          │                     │
+          ▼                     ▼
+ OrderingWriteDb        OrderingReadDb
+```
+
+Write flow:
+
+```text
+POST /api/orders
+      ↓
+CreateOrderCommand
+      ↓
+Command Handler
+      ↓
+OrderingWriteDb
+      ↓
+Event / Projection
+      ↓
+OrderingReadDb
+```
+
+Read flow:
+
+```text
+GET /api/orders/{id}
+      ↓
+GetOrderByIdQuery
+      ↓
+OrderingReadDb
+```
+
+The command handler must **not manually dual-write** to both databases.
+
+Instead:
 
 ```text
 OrderingWriteDb
-+
+      ↓
+Event / Projection
+      ↓
+OrderingReadDb
+```
+
+This introduces **eventual consistency**.
+
+Topics:
+
+- Write Model
+- Read Model
+- Projection
+- Independent data models
+- Eventual Consistency
+- Independent read/write scaling
+
+---
+
+# Database-per-Service
+
+Each microservice owns its data.
+
+A service must not directly query another service's database.
+
+```text
+Catalog
+   ↓
+CatalogDb
+
+Ordering
+   ├── OrderingWriteDb
+   └── OrderingReadDb
+```
+
+Services communicate through APIs or integration events instead of sharing database tables.
+
+---
+
+# Redis
+
+Redis will be used as a distributed cache for one representative query:
+
+```http
+GET /api/products/{id}
+```
+
+Cache-aside flow:
+
+```text
+Request
+   ↓
+Redis
+   ├── HIT → Return cached data
+   │
+   └── MISS
+         ↓
+      SQL Server
+         ↓
+      Cache result
+         ↓
+       Return
+```
+
+Topics:
+
+- Distributed caching
+- Cache-aside
+- Cache hit
+- Cache miss
+- TTL
+- Cache invalidation
+- Serialization
+- Redis vs in-memory cache
+
+---
+
+# Event-Driven Architecture with Azure Service Bus
+
+Azure Service Bus is the primary message broker for this branch.
+
+Representative event:
+
+```text
+OrderCreated
+```
+
+Conceptual flow:
+
+```text
+Ordering
+    ↓
+OrderingWriteDb
+    ↓
+Outbox
+    ↓
+Outbox Publisher
+    ↓
+Azure Service Bus
+    ↓
+Azure Function
+    ↓
+Notification
+```
+
+Topics:
+
+- Event-Driven Architecture
+- Integration Events
+- Queues
+- Topics
+- Subscriptions
+- Publisher
+- Consumer
+- Retry
+- Dead-letter handling
+- Eventual Consistency
+
+---
+
+# Outbox Pattern
+
+We want to avoid this failure:
+
+```text
+Save Order        ✓
+Publish Event     ✗
+```
+
+If the database operation succeeds but publishing fails, the system becomes inconsistent.
+
+Instead, the Order and Outbox Message are saved in the same local database transaction:
+
+```text
+Database Transaction
+      ├── Order
+      └── OutboxMessage
+             ↓
+           Commit
+```
+
+A background publisher later sends pending messages to Azure Service Bus.
+
+Conceptual flow:
+
+```text
+Order Transaction
+      ↓
+OrderingWriteDb
+      ↓
+OutboxMessages
+      ↓
+Background Publisher
+      ↓
+Azure Service Bus
+```
+
+This separates database consistency from broker availability.
+
+---
+
+# Azure Functions
+
+A .NET isolated Azure Function will process one Service Bus event.
+
+Representative flow:
+
+```text
+OrderCreated
+     ↓
+Azure Service Bus
+     ↓
+Service Bus Trigger
+     ↓
+Azure Function
+     ↓
+Simulated Notification
+```
+
+Topics:
+
+- .NET isolated worker
+- Triggers
+- Bindings
+- Asynchronous processing
+- Retry
+- Idempotency
+- Configuration
+- Logging
+
+---
+
+# Authentication and Authorization
+
+The Azure track uses **Microsoft Entra ID** as the primary Identity Provider.
+
+```text
+Microsoft Entra ID
+       ↓
+OAuth 2.0
+       ↓
+JWT Access Token
+       ↓
+ASP.NET Core API
+       ↓
+Authorization Policy
+```
+
+Topics:
+
+- Authentication vs Authorization
+- JWT
+- OAuth 2.0
+- App registrations
+- Scopes
+- App roles
+- Claims
+- ASP.NET Core authorization policies
+
+Representative protection:
+
+```text
+GET  /api/products/{id}
+        ↓
+Public or less restricted
+
+POST /api/products
+        ↓
+Authenticated + authorized
+
+POST /api/orders
+        ↓
+Authenticated + authorized
+```
+
+---
+
+# Azure Key Vault and Managed Identity
+
+Secrets must not be committed to Git.
+
+Representative cloud configuration:
+
+```text
+Application
+     ↓
+Managed Identity
+     ↓
+Azure Key Vault
+     ↓
+Secret / Configuration
+```
+
+Topics:
+
+- Secrets
+- Key Vault
+- Managed Identity
+- Azure RBAC
+- Environment-based configuration
+
+---
+
+# Observability
+
+Representative distributed flow:
+
+```text
+POST /orders
+     ↓
+Ordering API
+     ↓
+SQL Server
+     ↓
+Azure Service Bus
+     ↓
+Azure Function
+```
+
+We will observe:
+
+- Requests
+- Dependencies
+- Exceptions
+- Structured logs
+- Latency
+- Correlation
+- Distributed traces
+
+Main technologies:
+
+- Application Insights
+- Azure Monitor
+- OpenTelemetry
+- ASP.NET Core Health Checks
+
+Sensitive values such as passwords, access tokens, connection secrets, and private keys must never be logged.
+
+---
+
+# Azure Deployment
+
+We intentionally practice both App Service and AKS because they solve different deployment problems.
+
+## Azure App Service
+
+A representative API will be deployed to Azure App Service to learn managed PaaS deployment.
+
+```text
+Catalog API
+     ↓
+Azure App Service
+```
+
+## Containers and AKS
+
+Representative microservices will later be containerized:
+
+```text
+.NET Service
+     ↓
+Docker Image
+     ↓
+Azure Container Registry
+     ↓
+AKS
+```
+
+Kubernetes topics:
+
+- Pod
+- Deployment
+- Service
+- ConfigMap
+- Secret
+- Liveness probe
+- Readiness probe
+- Replicas
+- Rolling updates
+- Resource requests
+- Resource limits
+
+The goal is not to build an unnecessarily large Kubernetes platform.
+
+---
+
+# Testing
+
+The project uses the same representative-example strategy for tests.
+
+Required examples:
+
+- One xUnit unit test for an Application handler
+- One API integration test
+- Mocking only where useful
+- Optional container-backed integration test when it adds learning value
+
+Topics:
+
+- Unit vs integration testing
+- Arrange / Act / Assert
+- Test doubles
+- Mocking boundaries
+- API integration testing
+
+---
+
+# Performance, Scalability, and Security
+
+Representative topics include:
+
+- EF Core tracking vs `AsNoTracking`
+- Database indexes
+- Efficient queries
+- Pagination where useful
+- Redis caching
+- Async I/O
+- Cancellation tokens
+- Rate limiting
+- Input validation
+- Authorization policies
+- Secure secret management
+- Avoiding sensitive-data exposure
+- Horizontal scaling
+- Stateless APIs
+- Health checks
+
+---
+
+# Azure DevOps CI/CD
+
+The project finishes with a representative Azure DevOps YAML pipeline.
+
+```text
+Git Push
+   ↓
+Restore
+   ↓
+Build
+   ↓
+xUnit
+   ↓
+Publish Test Results
+   ↓
+Docker Build
+   ↓
+Push to ACR
+   ↓
+Deploy
+```
+
+Topics:
+
+- Continuous Integration
+- Continuous Delivery / Deployment
+- YAML pipelines
+- Build artifacts
+- Test results
+- Container images
+- Environment configuration
+- Deployment
+
+---
+
+# Official Azure-Scope Roadmap
+
+## Step 0 — Foundation and Solution Structure — COMPLETE
+
+Topics:
+
+- E-commerce domain
+- Repository
+- .NET 10 solution
+- Clean Architecture project structure
+- Git
+
+---
+
+## Step 1 — Catalog Domain + Persistence — COMPLETE
+
+Topics:
+
+- Product
+- Category
+- EF Core
+- SQL Server
+- Fluent entity configuration
+- Migration
+- CatalogDb
+
+---
+
+## Step 2 — Catalog CQRS + Validation + Result Pattern — IN PROGRESS
+
+Representative operations:
+
+```http
+POST /api/products
+GET /api/products/{id}
+```
+
+Topics:
+
+- CQRS fundamentals
+- MediatR
+- FluentValidation
+- Result Pattern
+- DTOs
+- Repository abstraction
+- Repository implementation
+- Dependency Injection
+
+---
+
+## Step 3 — Redis Distributed Caching
+
+Apply Redis to:
+
+```http
+GET /api/products/{id}
+```
+
+Topics:
+
+- Distributed caching
+- Cache-aside
+- TTL
+- Cache invalidation
+
+---
+
+## Step 4 — Ordering + DDD
+
+Implement one representative order flow.
+
+Topics:
+
+- Bounded Context
+- Aggregate Root
+- Entity
+- Value Object
+- Invariants
+- Domain Events
+- Repository / Unit of Work where useful
+
+---
+
+## Step 5 — CQRS with Separate Physical Databases
+
+Required databases:
+
+```text
+OrderingWriteDb
 OrderingReadDb
 ```
 
 Topics:
 
-* Write Model
-* Read Model
-* Projection
-* Eventual Consistency
-* Independent scaling
+- Write model
+- Read model
+- Projection
+- Eventual Consistency
+- Separate persistence paths
 
-### Step 37
+---
 
-Add OpenTelemetry and basic Distributed Tracing.
+## Step 6 — Azure Service Bus + EDA + Outbox
 
-Representative flow:
+Representative event:
 
 ```text
-Gateway
-→ Ordering
-→ Kafka
-→ Notification
+OrderCreated
 ```
 
-### Step 38
+Topics:
 
-Containerize the complete representative system.
+- Event-Driven Architecture
+- Azure Service Bus
+- Topics and subscriptions
+- Integration events
+- Outbox
+- Reliable publication
+- Retry
+- Idempotency
+- Dead-letter handling
+
+---
+
+## Step 7 — Azure Functions
+
+Consume the representative Service Bus event.
 
 Topics:
 
-* Dockerfiles
-* Docker Compose
-* Docker Networking
-* Environment Configuration
+- .NET isolated Function
+- Service Bus trigger
+- Retry
+- Idempotency
+- Dead-letter concepts
 
-### Step 39
+---
 
-Deploy a representative architecture with Kubernetes.
+## Step 8 — Microsoft Entra ID Security
 
 Topics:
 
-* Pods
-* Deployments
-* Services
-* ConfigMaps
-* Secrets
-* Health Probes
-* Replica Scaling
-* Rolling Updates
-* Resource Limits
+- JWT
+- OAuth 2.0
+- Entra ID
+- Scopes
+- Roles
+- Policies
+- Protected endpoints
 
-### Step 40
+---
 
-Production Readiness Review.
+## Step 9 — Key Vault + Application Insights
+
+Topics:
+
+- Managed Identity
+- Key Vault
+- Structured logging
+- OpenTelemetry
+- Application Insights
+- Error tracing
+- Health Checks
+
+---
+
+## Step 10 — Azure Deployment
+
+Topics:
+
+- App Service
+- Docker
+- Azure Container Registry
+- AKS
+- Kubernetes essentials
+- Scaling
+- Health probes
+
+---
+
+## Step 11 — Testing + Performance + Security
+
+Topics:
+
+- xUnit
+- Unit testing
+- Integration testing
+- EF Core optimization
+- Indexes
+- `AsNoTracking`
+- Rate limiting
+- Security review
+
+---
+
+## Step 12 — Azure DevOps CI/CD
+
+Topics:
+
+- Git
+- Azure DevOps
+- YAML pipeline
+- Restore
+- Build
+- Test
+- Docker image
+- ACR
+- Deployment
+
+---
+
+## Step 13 — Production and Architecture Review
 
 Review:
 
-* Security
-* Resilience
-* Scalability
-* Observability
-* Data Ownership
-* Event Contracts
-* Configuration
-* Secrets
-* Database migrations
-* Failure handling
-
-### Step 41
-
-Final Architecture Review and Learning Summary.
+- Clean Architecture
+- DDD
+- CQRS
+- Physical CQRS
+- EDA
+- Outbox
+- Redis
+- Security
+- Azure services
+- Observability
+- Scalability
+- Failure handling
+- Production readiness
 
 ---
 
-# Rapid Training Rule
+# Progress Tracker
 
-Every new concept follows the same process:
+| Step | Activity | Status |
+|---|---|---|
+| 0 | Foundation / solution / Git | Complete |
+| 1 | Catalog Domain + EF Core + SQL Server | Complete |
+| 2 | Catalog CQRS + validation + Result Pattern | In Progress |
+| 3 | Redis | Pending |
+| 4 | Ordering + DDD | Pending |
+| 5 | Physical CQRS | Pending |
+| 6 | Azure Service Bus + EDA + Outbox | Pending |
+| 7 | Azure Functions | Pending |
+| 8 | Entra ID + OAuth2 + JWT | Pending |
+| 9 | Key Vault + Application Insights | Pending |
+| 10 | App Service + Docker + ACR + AKS | Pending |
+| 11 | Testing + performance + security | Pending |
+| 12 | Azure DevOps CI/CD | Pending |
+| 13 | Production architecture review | Pending |
+
+---
+
+# Topics Intentionally Outside the Required Azure Scope
+
+The following topics are valuable, but they are not required to complete this branch:
+
+- Kafka
+- Saga
+- Compensating transactions
+- Event Sourcing
+- BFF
+- YARP API Gateway
+- Advanced Kubernetes
+- Helm
+- Service Mesh
+
+They can be explored in the `main` distributed-systems track or in later dedicated branches.
+
+This separation is intentional:
+
+> **Patterns should be introduced because they solve a problem, not simply because they are considered enterprise.**
+
+---
+
+# Expected Final Architecture
 
 ```text
-Understand the Problem
-       │
-       ▼
-Understand the Pattern
-       │
-       ▼
-Implement ONE Example
-       │
-       ▼
-Test It
-       │
-       ▼
-Review Production Considerations
-       │
-       ▼
-Explain How To Expand It
-       │
-       ▼
-Move Forward
+                         Client
+                           │
+                           ▼
+                   Microsoft Entra ID
+                           │
+                      OAuth2 / JWT
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+             ▼                           ▼
+       Catalog API                  Ordering API
+   Clean Architecture              DDD + CQRS
+             │                           │
+             ▼                    ┌──────┴──────┐
+         CatalogDb                │             │
+             │                    ▼             ▼
+             ▼             OrderingWriteDb OrderingReadDb
+           Redis                  │
+                                  ▼
+                                Outbox
+                                  │
+                                  ▼
+                         Azure Service Bus
+                                  │
+                                  ▼
+                          Azure Function
+                                  │
+                                  ▼
+                           Notification
+
+             Azure Key Vault / Managed Identity
+                           │
+                           ▼
+              Application Insights / OTel
 ```
 
-This repository intentionally avoids implementing the same pattern repeatedly when the learning value would be low.
-
----
-
-# Architecture Evolution
-
-The project starts simple:
+Deployment:
 
 ```text
 Catalog API
-     │
-     ▼
-CatalogDb
+     ↓
+Azure App Service
 ```
 
-Then evolves to:
+and:
 
 ```text
-Multiple Microservices
-```
-
-then:
-
-```text
-Microservices
-+
-Kafka
-```
-
-then:
-
-```text
-Microservices
-+
-Kafka
-+
-Outbox
-```
-
-then:
-
-```text
-Microservices
-+
-CQRS
-+
-Separate Databases
-```
-
-then:
-
-```text
-Microservices
-+
-Event Sourcing
-```
-
-and finally:
-
-```text
-Microservices
-+
-BFF
-+
-API Gateway
-+
-Kafka
-+
-Outbox
-+
-Event Sourcing
-+
-CQRS
-+
-Redis
-+
-Observability
-+
+.NET Microservices
+      ↓
 Docker
-+
-Kubernetes
+      ↓
+Azure Container Registry
+      ↓
+AKS
 ```
 
-The purpose is to understand **why each architectural decision exists**, instead of starting with unnecessary complexity.
-
----
-
-# Important Architecture Principle
-
-This project does not use patterns only because they are considered "enterprise."
-
-Every pattern should solve a real problem.
-
-For example:
+Delivery:
 
 ```text
-Problem:
-Frontend needs data from multiple services.
-
-Solution:
-BFF / API Composition.
-```
-
-```text
-Problem:
-Services need asynchronous communication.
-
-Solution:
-Kafka.
-```
-
-```text
-Problem:
-Database transaction succeeds but Kafka fails.
-
-Solution:
-Outbox Pattern.
-```
-
-```text
-Problem:
-Consumer processes the same event twice.
-
-Solution:
-Idempotency.
-```
-
-```text
-Problem:
-Read workload is very different from write workload.
-
-Solution:
-CQRS with separate read/write databases.
-```
-
-```text
-Problem:
-We need the complete history of an aggregate.
-
-Solution:
-Event Sourcing.
-```
-
-```text
-Problem:
-We need to deploy and scale containers reliably.
-
-Solution:
-Kubernetes.
-```
-
-Understanding the problem before using the pattern is one of the main goals of this repository.
-
----
-
-# Current Status
-
-Current phase:
-
-```text
-Step 0 — Domain and Scope
-```
-
-Completed:
-
-* E-commerce domain selected
-* Main services defined
-* Enterprise concepts selected
-* Rapid training strategy defined
-* Architecture roadmap defined
-
-Next:
-
-```text
-Step 1 — Create Solution and Folder Structure
+Git
+ ↓
+Azure DevOps
+ ↓
+Build
+ ↓
+Test
+ ↓
+Containerize
+ ↓
+Deploy
 ```
 
 ---
 
 # Main Learning Outcome
 
-By the end of this project, the objective is to understand how a modern .NET distributed backend can combine:
+By the end of the `azure-scope` branch, the objective is to be able to explain and demonstrate how a modern .NET backend combines:
 
 ```text
 .NET 10
 ASP.NET Core
 Clean Architecture
+DDD
 Microservices
+EF Core
+SQL Server
 CQRS
 Physical Read/Write Databases
-Event-Driven Architecture
-Kafka
-Event Sourcing
-Outbox Pattern
-Idempotency
 Redis
-JWT
-BFF
-API Gateway
-Resilience
-Observability
-Docker
-Kubernetes
-Testing
+Event-Driven Architecture
+Azure Service Bus
+Outbox
+Azure Functions
+JWT / OAuth2 / Entra ID
+Key Vault
+Managed Identity
+Application Insights
+OpenTelemetry
+App Service
+Docker / ACR / AKS
+xUnit
+Azure DevOps CI/CD
 ```
 
-while understanding not only **how to implement each technology**, but more importantly:
+The most important outcome is not memorizing technologies.
 
-> **why it exists, what problem it solves, when to use it, and when not to use it.**
+It is understanding:
+
+> **what problem each technology or pattern solves, why it belongs in the architecture, how to implement it, how to test it, and what trade-offs it creates.**
