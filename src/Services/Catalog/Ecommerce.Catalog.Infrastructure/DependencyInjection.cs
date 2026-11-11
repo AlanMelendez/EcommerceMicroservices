@@ -1,4 +1,6 @@
-﻿using Ecommerce.Catalog.Infrastructure.Persistence;
+﻿using Ecommerce.Catalog.Application.Abstractions.Persistence;
+using Ecommerce.Catalog.Infrastructure.Persistence;
+using Ecommerce.Catalog.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,10 @@ public static class DependencyInjection
 
         services.AddDbContext<CatalogDbContext>(options =>
             options.UseSqlServer(connectionString));
+
+        services.AddScoped<
+           ICatalogRepository,
+           CatalogRepository>();
 
         return services;
     }
