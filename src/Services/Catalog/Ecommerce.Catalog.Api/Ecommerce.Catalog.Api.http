@@ -3,4 +3,21 @@
 GET {{Ecommerce.Catalog.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
-###
+### Get product by Id
+GET {{Ecommerce.Catalog.Api_HostAddress}}/api/products/eb204f81-c072-4e13-a6e3-32959f690470
+Accept: application/json
+
+
+### Create product 
+POST {{Ecommerce.Catalog.Api_HostAddress}}/api/products/
+Content-Type: application/json
+Accept: application/json
+
+{
+
+  "name": "Laptop",
+  "price": 1500,
+  "stock": 10,
+  "categoryId": "eb204f81-c072-4e13-a6e3-32959f690470"
+
+}

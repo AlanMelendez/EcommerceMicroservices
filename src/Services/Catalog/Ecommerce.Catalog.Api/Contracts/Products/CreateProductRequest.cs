@@ -4,6 +4,6 @@
         string Name,
         decimal Price,
         int Stock,
-        Guid CateogoryId
-     );No
+        Guid CategoryId
+     );
 }
