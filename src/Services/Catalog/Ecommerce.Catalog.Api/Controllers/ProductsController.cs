@@ -26,7 +26,7 @@ namespace Ecommerce.Catalog.Api.Controllers
             var result = await sender.Send(command, cancellationToken);
 
             //handle errors
-            if (!result.IsSuccess) BadRequest(result.Error);
+            if (!result.IsSuccess) return BadRequest(result.Error);
 
             //Return the action
             return CreatedAtAction(
